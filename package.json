@@ -1,0 +1,32 @@
+{
+  "name": "@gowerstreet/route66",
+  "version": "1.0.0",
+  "description": "A minimal HTTP routing library for Sibilant",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx sibilant -x test-route66.sibilant",
+    "compile": "npx sibilant --file route66.sibilant >index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GowerStreet/route66.git"
+  },
+  "keywords": [
+    "minimal",
+    "http",
+    "routing",
+    "library",
+    "sibilant",
+    "sibilantjs"
+  ],
+  "author": "sleepyfox@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GowerStreet/route66/issues"
+  },
+  "homepage": "https://github.com/GowerStreet/route66#readme",
+  "devDependencies": {
+    "sibilant": "0.5.x",
+    "@gowerstreet/infintestimal": "1.x"
+  }
+}

@@ -1,21 +1,6 @@
-# route66
-
-A very minimalistic HTTP routing library for Sibilant (also usable in Node.js).
-
-## Usage
-
-The idea of Route66 is that, in typical LISP fashion, routes are data. Each route is a combination of
-a regular expression and a HTTP handler function to dispatch to, which takes (http-request, http-response)
-parameters. 
-
-A call to route66.create-dispatcher with the routes and a fallback 'not-found' handler (that is used if no matches are found) returns a dispatch function that when called with (url) returns the first matched handler function (or the not found handler). A simple example is provided below:
-
-The code is just 44 lines, so any questions: just read the source.
-
-```clojure
 ;; Imports
 (var http (require 'http)
-     route66 (require 'route66))
+     route66 (require "route66"))
 
 ;; Constants
 (var PORT 8000)
@@ -49,8 +34,3 @@ The code is just 44 lines, so any questions: just read the source.
   (.listen PORT "0.0.0.0"))
 
 (console.log "Server listening on port" PORT)
-```
-
-## License
-
-MIT - see the [license file](LICENSE).
