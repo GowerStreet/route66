@@ -15,7 +15,7 @@ The code is just 44 lines, so any questions: just read the source.
 ```clojure
 ;; Imports
 (var http (require 'http)
-     route66 (require 'route66))
+     route66 (require "@gowerstreet/route66"))
 
 ;; Constants
 (var PORT 8000)
