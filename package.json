@@ -1,6 +1,6 @@
 {
   "name": "@gowerstreet/route66",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A minimal HTTP routing library for Sibilant",
   "main": "index.js",
   "scripts": {
