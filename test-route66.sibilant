@@ -11,38 +11,43 @@
            (is ["/" home] (route66.matches [["/" home]] "/")))]
       ["A matcher doesn't match if the URL isn't found in routes"
        (#> (is null (route66.matches [["/" identity]] "/a")))]
-       ["A router takes a list of tuples (pattern, function) and returns a function"
-        (#> (var dispatch (route66.create-dispatcher [] identity))
-            (is 'function (typeof dispatch)))]
-       ["A router function matches everything against 404 for an empty route list"
-        (#> (var dispatch (route66.create-dispatcher [] identity))
-            (is identity (dispatch "/api/v1/cats")))]
-       ["A router function matches a simple route to a given function"
-        (#> (var home (#> "home")
-                 four-oh-four identity
-                 dispatch (route66.create-dispatcher [["/" home]] identity))
-            (is home (dispatch "/")))]
-       ["A Router can match one amongst many"
-        (#> (var home (#> "home")
-                 cats (#> "cats")
-                 four-oh-four identity
-                 routes  [["/" home] ["/cats" cats]]
-                 dispatch (route66.create-dispatcher routes four-oh-four))
-            (is home (dispatch "/")))]
-       ["A Router can match a second amongst many"
-        (#> (var home (#> "home")
-                 cats (#> "cats")
-                 four-oh-four identity
-                 routes  [["/" home] ["/cats" cats]]
-                 dispatch (route66.create-dispatcher routes four-oh-four))
-            (is cats (dispatch "/cats")))]
-       ["A router can match wildcards in the URL"
-        (#> (var home (#> "home")
-                 all-films (#> "all-films")
-                 four-oh-four identity
-                 routes [["/" home]
-                         ["/api/v1/grosses/all-films/(.+)/(.+)" all-films]]
-                 dispatch (route66.create-dispatcher routes identity))
-            (is all-films (dispatch "/api/v1/grosses/all-films/UK/2019-08-10")))]])
+      ["A router takes a list of tuples (pattern, function) and returns a function"
+       (#> (var dispatch (route66.create-dispatcher [] identity))
+           (is 'function (typeof dispatch)))]
+      ["A router function matches everything against 404 for an empty route list"
+       (#> (var dispatch (route66.create-dispatcher [] identity))
+           (is identity (dispatch "/api/v1/cats")))]
+      ["A router function matches a simple route to a given function"
+       (#> (var home (#> "home")
+                four-oh-four identity
+                dispatch (route66.create-dispatcher [["/" home]] identity))
+           (is home (dispatch "/")))]
+      ["A router doesn't match a route with a trailing /"
+       (#> (var home (#> "home")
+                four-oh-four identity
+                dispatch (route66.create-dispatcher [["/home" home]] identity))
+           (is four-oh-four (dispatch "/home/")))]
+      ["A Router can match one amongst many"
+       (#> (var home (#> "home")
+                cats (#> "cats")
+                four-oh-four identity
+                routes  [["/" home] ["/cats" cats]]
+                dispatch (route66.create-dispatcher routes four-oh-four))
+           (is home (dispatch "/")))]
+      ["A Router can match a second amongst many"
+       (#> (var home (#> "home")
+                cats (#> "cats")
+                four-oh-four identity
+                routes  [["/" home] ["/cats" cats]]
+                dispatch (route66.create-dispatcher routes four-oh-four))
+           (is cats (dispatch "/cats")))]
+      ["A router can match wildcards in the URL"
+       (#> (var home (#> "home")
+                all-films (#> "all-films")
+                four-oh-four identity
+                routes [["/" home]
+                        ["/api/v1/grosses/all-films/(.+)/(.+)" all-films]]
+                dispatch (route66.create-dispatcher routes identity))
+           (is all-films (dispatch "/api/v1/grosses/all-films/UK/2019-08-10")))]])
 
 (test-runner router-tests)
