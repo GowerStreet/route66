@@ -1,44 +1,71 @@
 ;; Imports
-(var assert (require 'assert))
+(var assert (require 'assert)
+     { parse } (require 'url))
 
 ;; Debug output
 (var DEBUG (or process.env.DEBUG false))
 (def log () (if DEBUG (apply console.log arguments)))
 
+;; Helpers
+(def partial1 (f x) (.bind f null x))
+(def partial2 (f x y) (.bind f null x y))
+(def partial3 (f x y z) (.bind f null x y z))
+
+;; Given a route and a URL returns true if it matches
+(def find-match? (url x)
+  (exists? (.match url (regex (+ "^" (first x) "$")))))
+
+;; Takes a route tuple [path fn]
+;; Returns the same tuple with the path where named parameters are
+;; replaced with a capture group.
+(def replace-route-params (route)
+  [(.replace (first route) (regex "\:[0-9a-zA-Z\-_]+" 'g) "([0-9a-zA-Z\-_]+)")
+   (second route)])
+
+;; Takes a URL
+;; Returns the path part stripped of query params
+(def strip-query-params (url)
+  (get (parse url) 'pathname))
+
 (def matches (routes url)
   ;; Takes a list of tuples [path, fn]
-  ;; Returns the first matching entry to the url
+  ;; Returns the first matching route tuple to the url
   ;; or null if not found
   (assert.ok (array? routes) "Routes must be an array of (reqexp handler-fn) tuples")
   (assert.ok (string? url) "URL must be a string")
 
-  (var matching (.filter routes
-                         (# (x)
-                            (exists? (.match url (regex (+ "^" (first x) "$"))))))
-       match (if (empty? matching)
-               null
-               (first matching)))
-  match)
+  (var path (strip-query-params url)
+       matching (pipe routes
+                      (.map replace-route-params)
+                      (.filter (partial1 find-match? path))))
+  (if (empty? matching)
+    null
+    (first matching)))
 
 (def create-dispatcher (routes not-found)
-  (# (url)
-     ;; Routes is an array of [path fn] tuples
-     ;; Each path is a string
-     ;; Each fn must have a signature of (req res)
-     ;; Returns correct function for route or not-found
-     (assert.ok (array? routes) "Routes must be an array of (reqexp handler-fn) tuples")
-     (assert.ok (function? not-found) "The 404 handler must be a function")
+  ;; Routes is an array of [path fn] tuples
+  ;; Each path is a string
+  ;; Each fn must have a signature of (req res)
+  ;; TODO:
+  ;; We want to extract route params and return a function that has
+  ;; been closed over these params
+  (assert.ok (array? routes) "Routes must be an array of (reqexp handler-fn) tuples")
+  (assert.ok (function? not-found) "The 404 handler must be a function")
+  (assert.ok (not (empty? routes)) "Routes cannot be empty")
 
-     (if (empty? routes)
-       not-found
-       (do
-         (var match (matches routes url))
-         (log "match" match "for" url)
-         (if (and (exists? match)
-                  (not (empty? match)))
-           (second match)
-           not-found)))))
+  ;; Dispatch function
+  (# (url)
+     ;; Returns correct function for route or not-found
+     (var match (matches routes url)
+          params (get (parse url true) 'query))
+     (log "match" match "for" url)
+     (if (and (exists? match)
+              (not (empty? match)))
+       (partial1 (second match) params)
+       not-found)))
 
 ;; Exports
-(assign module.exports {'matches matches
+(assign module.exports {'strip-query-params strip-query-params
+                        'replace-route-params replace-route-params
+                        'matches matches
                         'create-dispatcher create-dispatcher})

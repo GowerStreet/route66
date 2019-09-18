@@ -4,15 +4,19 @@ A very minimalistic HTTP routing library for Sibilant (also usable in Node.js).
 
 ## Usage
 
-The idea of Route66 is that, in typical LISP fashion, routes are data. Each route is a combination of
-a regular expression and a HTTP handler function to dispatch to, which takes (http-request, http-response)
-parameters. 
+The idea of Route66 is that, in typical LISP fashion, routes are data. Each route is a combination of a regular expression and a HTTP handler function to dispatch to, which takes (http-request, http-response) parameters.
 
-A call to route66.create-dispatcher with the routes and a fallback 'not-found' handler (that is used if no matches are found) returns a dispatch function that when called with (url) returns the first matched handler function (or the not found handler). A simple example is provided below:
+So a route looks like `["GET /api/cats" all-cats]`
 
-The code is just 44 lines, so any questions: just read the source.
+Route paths are expected to be ASCII alphanumerics, with the additions of underscore and hyphen characters. No support for extended character set support e.g. Unicode is planned at this time.
 
-```clojure
+Route paths may contain route parameters, which are prefixed with a colon character e.g. `/api/cats/:breed`
+
+A call to route66.create-dispatcher with the routes and a fallback 'not-found' handler (that is used if no matches are found) returns a dispatch function that when called with (url) returns the first matched handler function (or the not found handler). The correct handler function is wrapped in a closure that includes a `params` hash that includes both query and route parameters.
+
+A simple example is provided below:
+
+```scheme
 ;; Imports
 (var http (require 'http)
      route66 (require "@gowerstreet/route66"))
@@ -50,6 +54,8 @@ The code is just 44 lines, so any questions: just read the source.
 
 (console.log "Server listening on port" PORT)
 ```
+
+The entire library code is under a hundred lines, so any questions: Use the source, Luke!
 
 ## License
 
